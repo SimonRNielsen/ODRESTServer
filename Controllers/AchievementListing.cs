@@ -39,7 +39,7 @@ namespace ODRESTServer.Controllers
                 json = System.IO.File.ReadAllText(achievementFile);
             List<Achievement> achievements = JsonSerializer.Deserialize<List<Achievement>>(json) ?? new List<Achievement>();
 
-            return achievements.GetRange(Math.Max(achievements.Count - returnAmount, 0), Math.Min(returnAmount, achievements.Count)).ToArray();
+            return achievements.GetRange(Math.Max(achievements.Count - returnAmount, 0), Math.Min(returnAmount, achievements.Count));
 
         }
 
@@ -62,7 +62,7 @@ namespace ODRESTServer.Controllers
             if (achievements.Count == 0)
                 return Conflict(requestResults[AchievementResults.NoAchievementsEarned]);
 
-            return Ok(achievements.FindAll(x => x.UserEmail == userInfo.Email).ToArray());
+            return Ok(achievements.FindAll(x => x.UserEmail == userInfo.Email));
 
         }
 

@@ -171,7 +171,7 @@ namespace ODRESTServer.Controllers
 
             string json = System.IO.File.ReadAllText(userFile);
             List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
-            return users.ToArray();
+            return users;
 
         }
 
