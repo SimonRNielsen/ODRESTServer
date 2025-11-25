@@ -166,5 +166,16 @@ namespace ODRESTServer.Controllers
 
         }
 
+        [HttpDelete("clear")]
+        public IActionResult DeleteUsers()
+        {
+
+            lock (fileLock)
+                System.IO.File.WriteAllText(userFile, "[]");
+
+            return NoContent();
+
+        }
+
     }
 }
