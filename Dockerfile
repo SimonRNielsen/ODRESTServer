@@ -23,8 +23,14 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./ODRESTServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p /app/app_data
+COPY --from=publish app_data/achievements.json /app/app_data/achievements.json 
+COPY --from=publish app_data/users.json /app/app_data/users.json
+COPY --from=publish app_data/privateKey.json /app/app_data/privateKey.json
+COPY --from=publish app_data/publicKey.json /app/app_data/publicKey.json
 ENTRYPOINT ["dotnet", "ODRESTServer.dll"]
