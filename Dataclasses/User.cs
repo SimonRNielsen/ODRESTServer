@@ -70,8 +70,5 @@
 
         public required string Email { get; set; }
 
-
-        public required DateTime JoinTime { get; set; }
-
     }
 }

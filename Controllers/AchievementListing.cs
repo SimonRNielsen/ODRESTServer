@@ -9,12 +9,9 @@ namespace ODRESTServer.Controllers
     public class AchievementListing : ControllerBase
     {
 
-        private readonly ILogger<AchievementListing> _logger;
-        private readonly string achievementFile = "app_data/achievements.json";
-        private readonly string scoreFile = "app_data/highscore.json";
+        private readonly string achievementFile = "app_data/achievements.json", scoreFile = "app_data/highscore.json";
         private readonly int returnAmount = 10;
-        private static readonly object achievementFileLock = new object();
-        private static readonly object scoreFileLock = new object();
+        private static readonly object achievementFileLock = new object(), scoreFileLock = new object();
         private static readonly Dictionary<AchievementResults, string> achievementResults = new Dictionary<AchievementResults, string>
         {
 
@@ -28,7 +25,15 @@ namespace ODRESTServer.Controllers
 
         public AchievementListing(ILogger<AchievementListing> logger)
         {
-            _logger = logger;
+
+            string path = Path.GetDirectoryName(achievementFile)!;
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            if (!System.IO.File.Exists(achievementFile))
+                ClearAchievementsAndScore();
+
         }
 
         /// <summary>
@@ -55,7 +60,7 @@ namespace ODRESTServer.Controllers
         /// <param name="userInfo">Users info to compare against storage</param>
         /// <returns>Response/list of own achievements</returns>
         [HttpPost("getownachievements")]
-        public IActionResult GetOwn([FromBody] LoginDTO userInfo)
+        public IActionResult GetOwn([FromBody] UserReturnDTO userInfo)
         {
 
             if (userInfo == null || string.IsNullOrWhiteSpace(userInfo.Email))
@@ -176,7 +181,7 @@ namespace ODRESTServer.Controllers
         /// <param name="userInfo">Data needed to locate score</param>
         /// <returns>Own highscore</returns>
         [HttpPost("getownscore")]
-        public IActionResult GetOwnScore([FromBody] LoginDTO userInfo)
+        public IActionResult GetOwnScore([FromBody] UserReturnDTO userInfo)
         {
 
             if (userInfo == null || string.IsNullOrWhiteSpace(userInfo.Email))

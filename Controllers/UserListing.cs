@@ -11,11 +11,9 @@ namespace ODRESTServer.Controllers
     public class UserListing : ControllerBase
     {
 
-        private readonly ILogger<UserListing> _logger;
         private readonly string userFile = "app_data/users.json";
         private static readonly object fileLock = new object();
-        private string privateKey;
-        private string publicKey; 
+        private string privateKey, publicKey;
         private static readonly Dictionary<UserResults, string> userResults = new Dictionary<UserResults, string>
         {
 
@@ -30,8 +28,6 @@ namespace ODRESTServer.Controllers
         public UserListing(ILogger<UserListing> logger)
         {
 
-            _logger = logger;
-
             using (RSA rsa = RSA.Create())
             {
 
@@ -39,6 +35,14 @@ namespace ODRESTServer.Controllers
                 publicKey = rsa.ToXmlString(false);
 
             }
+
+            string path = Path.GetDirectoryName(userFile)!;
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            if (!System.IO.File.Exists(userFile))
+                DeleteUsers();
 
         }
 
@@ -94,7 +98,6 @@ namespace ODRESTServer.Controllers
 
                     Name = Convert.ToBase64String(userName),
                     Email = Convert.ToBase64String(email),
-                    JoinTime = user.JoinTime
 
                 };
 
@@ -212,7 +215,7 @@ namespace ODRESTServer.Controllers
 
     public enum UserResults
     {
-        
+
         Created,
         FailedCreation,
         FailedLogin,
