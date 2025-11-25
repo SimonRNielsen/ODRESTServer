@@ -47,10 +47,7 @@ namespace ODRESTServer.Controllers
         public IActionResult GetOwn([FromBody] LoginDTO userInfo)
         {
 
-            if (userInfo == null)
-                return BadRequest(requestResults[AchievementResults.InvalidUserInfo]);
-
-            if (string.IsNullOrWhiteSpace(userInfo.Email))
+            if (userInfo == null || string.IsNullOrWhiteSpace(userInfo.Email))
                 return BadRequest(requestResults[AchievementResults.InvalidUserInfo]);
 
             string json;
