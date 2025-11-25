@@ -13,6 +13,16 @@ namespace ODRESTServer.Controllers
         private readonly string achievementFile = "app_data/achievements.json";
         private readonly int returnAmount = 10;
         private static readonly object fileLock = new object();
+        private static readonly Dictionary<AchievementResults, string> requestResults = new Dictionary<AchievementResults, string> 
+        {
+            
+            { AchievementResults.AddSuccess, "Achievement added" },
+            { AchievementResults.InvalidUserInfo, "Bad request" },
+            { AchievementResults.NoAchievementsEarned, "No achievements found" },
+            { AchievementResults.InvalidData, "Invalid achievement data" },
+            { AchievementResults.AlreadyEarned, "Achievement already earned for user" }
+
+        };
 
         public AchievementListing(ILogger<AchievementListing> logger)
         {
@@ -38,10 +48,10 @@ namespace ODRESTServer.Controllers
         {
 
             if (userInfo == null)
-                return BadRequest("Bad request");
+                return BadRequest(requestResults[AchievementResults.InvalidUserInfo]);
 
             if (string.IsNullOrWhiteSpace(userInfo.Email))
-                return BadRequest("Invalid user email");
+                return BadRequest(requestResults[AchievementResults.InvalidUserInfo]);
 
             string json;
 
@@ -50,7 +60,7 @@ namespace ODRESTServer.Controllers
             List<Achievement> achievements = JsonSerializer.Deserialize<List<Achievement>>(json) ?? new List<Achievement>();
 
             if (achievements.Count == 0)
-                return Conflict("No achievements found");
+                return Conflict(requestResults[AchievementResults.NoAchievementsEarned]);
 
             return Ok(achievements.FindAll(x => x.UserEmail == userInfo.Email).ToArray());
 
@@ -60,11 +70,8 @@ namespace ODRESTServer.Controllers
         public IActionResult AddEarnedAchievement([FromBody] Achievement achievement)
         {
 
-            if (achievement == null)
-                return BadRequest("Achievement data incomplete");
-
-            if (string.IsNullOrWhiteSpace(achievement.UserEmail) || string.IsNullOrWhiteSpace(achievement.UserName))
-                return BadRequest("Invalid user email or username");
+            if (achievement == null || string.IsNullOrWhiteSpace(achievement.UserEmail) || string.IsNullOrWhiteSpace(achievement.UserName))
+                return BadRequest(requestResults[AchievementResults.InvalidData]);
 
             lock (fileLock)
             {
@@ -73,7 +80,7 @@ namespace ODRESTServer.Controllers
                 List<Achievement> achievements = JsonSerializer.Deserialize<List<Achievement>>(json) ?? new List<Achievement>();
 
                 if (achievements.Any(x => x.UserEmail == achievement.UserEmail && x.AchievementID == achievement.AchievementID))
-                    return Conflict("Achievement already earned for user");
+                    return Conflict(requestResults[AchievementResults.AlreadyEarned]);
 
                 achievements.Add(achievement);
 
@@ -82,7 +89,7 @@ namespace ODRESTServer.Controllers
 
             }
 
-            return Ok("Achievement added");
+            return Ok(requestResults[AchievementResults.AddSuccess]);
 
         }
 
@@ -98,4 +105,16 @@ namespace ODRESTServer.Controllers
         }
 
     }
+
+    public enum AchievementResults
+    {
+
+        AddSuccess,
+        InvalidUserInfo,
+        NoAchievementsEarned,
+        InvalidData,
+        AlreadyEarned
+
+    }
+
 }

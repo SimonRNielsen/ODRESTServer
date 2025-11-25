@@ -12,10 +12,19 @@ namespace ODRESTServer.Controllers
     {
 
         private readonly ILogger<UserListing> _logger;
-        private readonly string userFile = "app_data/users.json", invalidPassOrMail = "Invalid password or email", failedCreate = "Couldn't create user", failedLogin = "Login attempt failed";
+        private readonly string userFile = "app_data/users.json";
         private static readonly object fileLock = new object();
         private string privateKey;
-        private string publicKey;
+        private string publicKey; 
+        private static readonly Dictionary<UserResults, string> userResults = new Dictionary<UserResults, string>
+        {
+
+            { UserResults.Created, "User created" },
+            { UserResults.FailedCreation, "Couldn't create user" },
+            { UserResults.FailedLogin, "Login attempt failed" },
+            { UserResults.InvalidPassOrMail, "Invalid password or email" }
+
+        };
 
 
         public UserListing(ILogger<UserListing> logger)
@@ -39,7 +48,7 @@ namespace ODRESTServer.Controllers
         {
 
             if (loginAttempt == null)
-                return Conflict(failedLogin);
+                return Conflict(userResults[UserResults.FailedLogin]);
 
             UserReturnDTO result;
 
@@ -50,19 +59,19 @@ namespace ODRESTServer.Controllers
                 List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
 
                 if (users.Count == 0)
-                    return Conflict(failedLogin);
+                    return Conflict(userResults[UserResults.FailedLogin]);
 
                 var user = users.FirstOrDefault(x => x.Email == loginAttempt.Email);
 
                 if (user == null)
-                    return Unauthorized(invalidPassOrMail);
+                    return Unauthorized(userResults[UserResults.InvalidPassOrMail]);
 
                 byte[] inputPlusSalt = DecryptedData(Convert.FromBase64String(loginAttempt.Password)).Concat(user.Salt).ToArray();
                 using SHA256 mySHA256 = SHA256.Create();
                 byte[] passPlusSaltHash = mySHA256.ComputeHash(inputPlusSalt);
 
                 if (!passPlusSaltHash.SequenceEqual(user.PasswordHashWithSalt))
-                    return Unauthorized(invalidPassOrMail);
+                    return Unauthorized(userResults[UserResults.InvalidPassOrMail]);
 
                 byte[] userName;
                 byte[] email;
@@ -97,7 +106,7 @@ namespace ODRESTServer.Controllers
         {
 
             if (newUser == null)
-                return Conflict(failedCreate);
+                return Conflict(userResults[UserResults.FailedCreation]);
 
             lock (fileLock)
             {
@@ -106,7 +115,7 @@ namespace ODRESTServer.Controllers
                 List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
 
                 if (users.Any(x => x.Email == newUser.Email))
-                    return Conflict(failedCreate);
+                    return Conflict(userResults[UserResults.FailedCreation]);
 
                 byte[] salt = new byte[16];
                 RandomNumberGenerator.Fill(salt);
@@ -133,7 +142,7 @@ namespace ODRESTServer.Controllers
 
             }
 
-            return Ok("User created");
+            return Ok(userResults[UserResults.Created]);
 
         }
 
@@ -178,4 +187,15 @@ namespace ODRESTServer.Controllers
         }
 
     }
+
+    public enum UserResults
+    {
+        
+        Created,
+        FailedCreation,
+        FailedLogin,
+        InvalidPassOrMail
+
+    }
+
 }
