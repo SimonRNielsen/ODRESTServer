@@ -57,7 +57,7 @@ namespace ODRESTServer.Controllers
                 if (user == null)
                     return Unauthorized(invalidPassOrMail);
 
-                byte[] inputPlusSalt = DecryptedData(loginAttempt.Password).Concat(user.Salt).ToArray();
+                byte[] inputPlusSalt = DecryptedData(Convert.FromBase64String(loginAttempt.Password)).Concat(user.Salt).ToArray();
                 using SHA256 mySHA256 = SHA256.Create();
                 byte[] passPlusSaltHash = mySHA256.ComputeHash(inputPlusSalt);
 
@@ -111,7 +111,7 @@ namespace ODRESTServer.Controllers
                 byte[] salt = new byte[16];
                 RandomNumberGenerator.Fill(salt);
 
-                byte[] passPlusSalt = DecryptedData(newUser.Password).Concat(salt).ToArray();
+                byte[] passPlusSalt = DecryptedData(Convert.FromBase64String(newUser.Password)).Concat(salt).ToArray();
                 using SHA256 mySHA256 = SHA256.Create();
                 byte[] hashedPassWithSalt = mySHA256.ComputeHash(passPlusSalt);
 

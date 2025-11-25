@@ -7,6 +7,9 @@ namespace ODRESTServer.Dataclasses
         public required DateTime Date { get; set; }
 
 
+        public required string UserName { get; set; }
+
+
         public required string UserEmail { get; set; }
 
 
