@@ -31,6 +31,4 @@ COPY --from=publish /app/publish .
 RUN mkdir -p /app/app_data
 COPY --from=publish app_data/achievements.json /app/app_data/achievements.json 
 COPY --from=publish app_data/users.json /app/app_data/users.json
-COPY --from=publish app_data/privateKey.json /app/app_data/privateKey.json
-COPY --from=publish app_data/publicKey.json /app/app_data/publicKey.json
 ENTRYPOINT ["dotnet", "ODRESTServer.dll"]
