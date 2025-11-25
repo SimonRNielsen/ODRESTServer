@@ -1,5 +1,9 @@
 ﻿namespace ODRESTServer.Dataclasses
 {
+
+    /// <summary>
+    /// Data storage class for saving relevant info pertinent for a specific user
+    /// </summary>
     public class User
     {
         
@@ -19,6 +23,9 @@
 
     }
 
+    /// <summary>
+    /// Data transfer object with data needed for logging in
+    /// </summary>
     public class LoginDTO
     {
 
@@ -34,7 +41,9 @@
 
     }
 
-
+    /// <summary>
+    /// Data transfer object with data pertinent for creating a new user
+    /// </summary>
     public class CreateUserDTO
     {
 
@@ -49,7 +58,9 @@
 
     }
 
-
+    /// <summary>
+    /// Data transfer object that's used for sending data to requestee
+    /// </summary>
     public class UserReturnDTO
     {
 

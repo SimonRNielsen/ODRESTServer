@@ -29,6 +29,10 @@ namespace ODRESTServer.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Endpoint for requesting 10 last earned achievements published to server
+        /// </summary>
+        /// <returns>List of 10 last earned achievements added to data storage</returns>
         [HttpGet("earned")]
         public IEnumerable<Achievement> GetLastTen()
         {
@@ -43,6 +47,11 @@ namespace ODRESTServer.Controllers
 
         }
 
+        /// <summary>
+        /// Endpoint for user to check own already earned achievements
+        /// </summary>
+        /// <param name="userInfo">Users info to compare against storage</param>
+        /// <returns>Response/list of own achievements</returns>
         [HttpPost("getown")]
         public IActionResult GetOwn([FromBody] LoginDTO userInfo)
         {
@@ -63,6 +72,11 @@ namespace ODRESTServer.Controllers
 
         }
 
+        /// <summary>
+        /// Endpoint for publishing earned achievement
+        /// </summary>
+        /// <param name="achievement">Achievement to publish</param>
+        /// <returns>Response</returns>
         [HttpPost("add")]
         public IActionResult AddEarnedAchievement([FromBody] Achievement achievement)
         {
@@ -90,6 +104,10 @@ namespace ODRESTServer.Controllers
 
         }
 
+        /// <summary>
+        /// Endpoint for clearing achievement "memory"
+        /// </summary>
+        /// <returns>Response</returns>
         [HttpDelete("clear")]
         public IActionResult ClearAchievements()
         {

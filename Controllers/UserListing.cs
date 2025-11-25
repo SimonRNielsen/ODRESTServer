@@ -42,7 +42,11 @@ namespace ODRESTServer.Controllers
 
         }
 
-
+        /// <summary>
+        /// Endpoint to "log in"
+        /// </summary>
+        /// <param name="loginAttempt">Data needed to verify user</param>
+        /// <returns>Response</returns>
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDTO loginAttempt)
         {
@@ -100,7 +104,11 @@ namespace ODRESTServer.Controllers
 
         }
 
-
+        /// <summary>
+        /// Endpoint for adding/creating a new user and adding it to "users.json"
+        /// </summary>
+        /// <param name="newUser">User to add, contains encrypted data</param>
+        /// <returns>Response</returns>
         [HttpPost("add")]
         public IActionResult CreateUser([FromBody] CreateUserDTO newUser)
         {
@@ -146,7 +154,11 @@ namespace ODRESTServer.Controllers
 
         }
 
-
+        /// <summary>
+        /// Method for decrypting recieved data
+        /// </summary>
+        /// <param name="data">Data to decrypt</param>
+        /// <returns>Decrypted data</returns>
         private byte[] DecryptedData(byte[] data)
         {
 
@@ -160,11 +172,17 @@ namespace ODRESTServer.Controllers
 
         }
 
-
+        /// <summary>
+        /// Endpoint to get public key
+        /// </summary>
+        /// <returns>Public RSA-encryption key</returns>
         [HttpGet("publickey")]
         public string GetPublicKey() => publicKey;
 
-
+        /// <summary>
+        /// Testing tool to see contents of the users.json file
+        /// </summary>
+        /// <returns>All "users"</returns>
         [HttpGet("testreader")]
         public IEnumerable<User> Get()
         {
@@ -175,6 +193,10 @@ namespace ODRESTServer.Controllers
 
         }
 
+        /// <summary>
+        /// Deletes the contents of "users.json"
+        /// </summary>
+        /// <returns>Response</returns>
         [HttpDelete("clear")]
         public IActionResult DeleteUsers()
         {

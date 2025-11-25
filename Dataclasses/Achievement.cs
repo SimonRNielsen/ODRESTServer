@@ -1,5 +1,9 @@
 namespace ODRESTServer.Dataclasses
 {
+
+    /// <summary>
+    /// Data storage class for saving information pertinent for a earned achievement
+    /// </summary>
     public class Achievement
     {
 
