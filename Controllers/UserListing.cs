@@ -12,7 +12,7 @@ namespace ODRESTServer.Controllers
     {
 
         private readonly ILogger<UserListing> _logger;
-        private readonly string userFile = "app_data/users.json", invalidPassOrMail = "Invalid password or email";
+        private readonly string userFile = "app_data/users.json", invalidPassOrMail = "Invalid password or email", failedCreate = "Couldn't create user", failedLogin = "Login attempt failed";
         private static readonly object fileLock = new object();
         private string privateKey;
         private string publicKey;
@@ -39,7 +39,7 @@ namespace ODRESTServer.Controllers
         {
 
             if (loginAttempt == null)
-                return BadRequest("Login attempt was null");
+                return Conflict(failedLogin);
 
             UserReturnDTO result;
 
@@ -50,7 +50,7 @@ namespace ODRESTServer.Controllers
                 List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
 
                 if (users.Count == 0)
-                    return Conflict("No users found");
+                    return Conflict(failedLogin);
 
                 var user = users.FirstOrDefault(x => x.Email == loginAttempt.Email);
 
@@ -97,7 +97,7 @@ namespace ODRESTServer.Controllers
         {
 
             if (newUser == null)
-                return BadRequest("User was null");
+                return Conflict(failedCreate);
 
             lock (fileLock)
             {
@@ -105,8 +105,8 @@ namespace ODRESTServer.Controllers
                 string json = System.IO.File.ReadAllText(userFile);
                 List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
 
-                if (users.Exists(x => x.Email == newUser.Email))
-                    return Conflict("User already exists");
+                if (users.Any(x => x.Email == newUser.Email))
+                    return Conflict(failedCreate);
 
                 byte[] salt = new byte[16];
                 RandomNumberGenerator.Fill(salt);
