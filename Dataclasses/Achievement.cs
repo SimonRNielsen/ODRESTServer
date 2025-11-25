@@ -20,4 +20,25 @@ namespace ODRESTServer.Dataclasses
         public required int AchievementID { get; set; }
 
     }
+
+    /// <summary>
+    /// Data storage class for saving information pertinent for a highscore
+    /// </summary>
+    public class HighScore
+    {
+
+
+        public required DateTime Date { get; set; }
+
+
+        public required string UserName { get; set; }
+
+
+        public required string UserEmail { get; set; }
+
+
+        public required int Score { get; set; }
+
+    }
+
 }
