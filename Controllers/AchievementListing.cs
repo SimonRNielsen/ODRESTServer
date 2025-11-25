@@ -149,7 +149,7 @@ namespace ODRESTServer.Controllers
                 if (scores.Any(x => x.UserEmail == score.UserEmail && x.Score >= score.Score))
                     return Conflict(achievementResults[AchievementResults.AlreadyEarned]);
 
-                HighScore highScore = scores.Find(x => x.UserEmail == score.UserEmail);
+                HighScore? highScore = scores.Find(x => x.UserEmail == score.UserEmail);
 
                 if (highScore != null)
                 {
@@ -196,7 +196,7 @@ namespace ODRESTServer.Controllers
             if (scores.Count == 0 || !scores.Any(x => x.UserEmail == userInfo.Email))
                 return Conflict(achievementResults[AchievementResults.NoAchievementsEarned]);
 
-            HighScore score = scores.Find(x => x.UserEmail == userInfo.Email);
+            HighScore score = scores.Find(x => x.UserEmail == userInfo.Email)!;
 
             return Ok(score);
 
