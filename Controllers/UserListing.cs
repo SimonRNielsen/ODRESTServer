@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ODRESTServer.Dataclasses;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -31,8 +32,8 @@ namespace ODRESTServer.Controllers
             using (RSA rsa = RSA.Create())
             {
 
-                privateKey = rsa.ToXmlString(true);
-                publicKey = rsa.ToXmlString(false);
+                privateKey = Environment.GetEnvironmentVariable("RSA_PRIVATE_KEY")!;
+                publicKey = Environment.GetEnvironmentVariable("RSA_PUBLIC_KEY")!;
 
             }
 
