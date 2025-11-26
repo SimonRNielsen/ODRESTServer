@@ -29,7 +29,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 RUN mkdir -p /app/app_data
-COPY --from=publish app_data/achievements.json /app/app_data/achievements.json 
-COPY --from=publish app_data/users.json /app/app_data/users.json
-COPY --from=publish app_data/highscore.json /app/app_data/highscore.json
 ENTRYPOINT ["dotnet", "ODRESTServer.dll"]
