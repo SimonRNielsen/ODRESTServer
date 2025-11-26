@@ -32,8 +32,8 @@ namespace ODRESTServer.Controllers
             using (RSA rsa = RSA.Create())
             {
 
-                privateKey = Environment.GetEnvironmentVariable("RSA_PRIVATE_KEY")!;
-                publicKey = Environment.GetEnvironmentVariable("RSA_PUBLIC_KEY")!;
+                privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(Environment.GetEnvironmentVariable("RSA_PRIVATE_KEY")!));
+                publicKey = Encoding.UTF8.GetString(Convert.FromBase64String(Environment.GetEnvironmentVariable("RSA_PUBLIC_KEY")!));
 
             }
 
