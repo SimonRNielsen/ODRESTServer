@@ -213,6 +213,15 @@ namespace ODRESTServer.Controllers
 
         }
 
+
+        [HttpHead("ping")]
+        public IActionResult Ping()
+        {
+
+            return Ok();
+
+        }
+
     }
 
     public enum UserResults
