@@ -11,9 +11,9 @@ namespace ODRESTServer.Controllers
     public class UserListing : ControllerBase
     {
 
-        private readonly string userFile = "app_data/users.json";
+        private static readonly string userFile = "app_data/users.json";
         private static readonly object fileLock = new object();
-        private string privateKey, publicKey;
+        private static string privateKey, publicKey;
         private static readonly Dictionary<UserResults, string> userResults = new Dictionary<UserResults, string>
         {
 
@@ -25,7 +25,7 @@ namespace ODRESTServer.Controllers
         };
 
 
-        public UserListing(ILogger<UserListing> logger)
+        static UserListing()
         {
 
             using (RSA rsa = RSA.Create())
@@ -42,7 +42,8 @@ namespace ODRESTServer.Controllers
                 Directory.CreateDirectory(path);
 
             if (!System.IO.File.Exists(userFile))
-                DeleteUsers();
+                lock (fileLock)
+                    System.IO.File.WriteAllText(userFile, "[]");
 
         }
 
