@@ -9,7 +9,7 @@ namespace ODRESTServer.Controllers
     public class AchievementListing : ControllerBase
     {
 
-        private readonly string achievementFile = "app_data/achievements.json", scoreFile = "app_data/highscore.json";
+        private readonly string achievementFile = "tmp/achievements.json", scoreFile = "tmp/highscore.json";
         private readonly int returnAmount = 10;
         private static readonly object achievementFileLock = new object(), scoreFileLock = new object();
         private static readonly Dictionary<AchievementResults, string> achievementResults = new Dictionary<AchievementResults, string>

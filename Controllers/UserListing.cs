@@ -12,7 +12,7 @@ namespace ODRESTServer.Controllers
     public class UserListing : ControllerBase
     {
 
-        private static readonly string userFile = "app_data/users.json";
+        private static readonly string userFile = "tmp/users.json";
         private static readonly object fileLock = new object();
         private static string privateKey, publicKey;
         private static readonly Dictionary<UserResults, string> userResults = new Dictionary<UserResults, string>
