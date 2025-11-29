@@ -11,6 +11,7 @@ namespace ODRESTServer.Controllers
 
         private readonly string achievementFile = "tmp/achievements.json", scoreFile = "tmp/highscore.json";
         private readonly int returnAmount = 10;
+        private static readonly string resetPass;
         private static readonly object achievementFileLock = new object(), scoreFileLock = new object();
         private static readonly Dictionary<AchievementResults, string> achievementResults = new Dictionary<AchievementResults, string>
         {
@@ -32,7 +33,15 @@ namespace ODRESTServer.Controllers
                 Directory.CreateDirectory(path);
 
             if (!System.IO.File.Exists(achievementFile))
-                ClearAchievementsAndScore();
+                ResetAction();
+
+        }
+
+
+        static AchievementListing()
+        {
+
+            resetPass = Environment.GetEnvironmentVariable("RESET_PASSWORD")!;
 
         }
 
@@ -116,13 +125,13 @@ namespace ODRESTServer.Controllers
         /// </summary>
         /// <returns>Response</returns>
         [HttpDelete("clear")]
-        public IActionResult ClearAchievementsAndScore()
+        public IActionResult ClearAchievementsAndScore([FromBody] string text)
         {
 
-            lock (achievementFileLock)
-                System.IO.File.WriteAllText(achievementFile, "[]");
-            lock (scoreFileLock)
-                System.IO.File.WriteAllText(scoreFile, "[]");
+            if (text != resetPass)
+                return BadRequest();
+
+            ResetAction();
 
             return NoContent();
 
@@ -217,6 +226,33 @@ namespace ODRESTServer.Controllers
             List<HighScore> scores = JsonSerializer.Deserialize<List<HighScore>>(json) ?? new List<HighScore>();
 
             return scores.OrderByDescending(x => x.Score).Take(returnAmount).ToList();
+
+        }
+
+
+        private void ResetAction()
+        {
+
+            List<Achievement> defaultAchievements = new List<Achievement>();
+            for (int i = 0; i < 5; i++)
+            {
+
+                defaultAchievements.Add(new Achievement { UserName = "Morten", Date = DateTime.UtcNow, UserEmail = "morten@oceandefender.dk", AchievementID = i });
+                defaultAchievements.Add(new Achievement { UserName = "Goosifer", Date = DateTime.UtcNow, UserEmail = "goosifer@oceandefender.dk", AchievementID = i });
+
+            }
+
+            List<HighScore> defaultHighScores = new List<HighScore>();
+            defaultHighScores.Add(new HighScore { UserName = "Morten", Date = DateTime.UtcNow, UserEmail = "morten@oceandefender.dk", Score = 10000 });
+            defaultHighScores.Add(new HighScore { UserName = "Goosifer", Date = DateTime.UtcNow, UserEmail = "goosifer@oceandefender.dk", Score = 666 });
+
+            var updatedAchievements = JsonSerializer.Serialize(defaultAchievements, new JsonSerializerOptions { WriteIndented = true });
+            var updatedHighScores = JsonSerializer.Serialize(defaultHighScores, new JsonSerializerOptions { WriteIndented = true });
+
+            lock (achievementFileLock)
+                System.IO.File.WriteAllText(achievementFile, updatedAchievements);
+            lock (scoreFileLock)
+                System.IO.File.WriteAllText(scoreFile, updatedHighScores);
 
         }
 

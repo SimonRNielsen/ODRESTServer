@@ -12,7 +12,7 @@ namespace ODRESTServer.Controllers
     public class UserListing : ControllerBase
     {
 
-        private static readonly string userFile = "tmp/users.json";
+        private static readonly string userFile = "tmp/users.json", resetPass;
         private static readonly object fileLock = new object();
         private static string privateKey, publicKey;
         private static readonly Dictionary<UserResults, string> userResults = new Dictionary<UserResults, string>
@@ -37,14 +37,21 @@ namespace ODRESTServer.Controllers
 
             }
 
+            resetPass = Environment.GetEnvironmentVariable("RESET_PASSWORD")!;
+
             string path = Path.GetDirectoryName(userFile)!;
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
+            List<User> createUsers = new List<User>();
+            createUsers.Add(HashData(new CreateUserDTO { Name = "Morten", Email = "morten@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_ONE_PASSWORD")! }));
+            createUsers.Add(HashData(new CreateUserDTO { Name = "Goosifer", Email = "goosifer@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_TWO_PASSWORD")! }));
+            var defaultUsers = JsonSerializer.Serialize(createUsers, new JsonSerializerOptions { WriteIndented = true });
+
             if (!System.IO.File.Exists(userFile))
                 lock (fileLock)
-                    System.IO.File.WriteAllText(userFile, "[]");
+                    System.IO.File.WriteAllText(userFile, defaultUsers);
 
         }
 
@@ -203,11 +210,13 @@ namespace ODRESTServer.Controllers
         /// </summary>
         /// <returns>Response</returns>
         [HttpDelete("clear")]
-        public IActionResult DeleteUsers()
+        public IActionResult DeleteUsers([FromBody] string text)
         {
 
-            lock (fileLock)
-                System.IO.File.WriteAllText(userFile, "[]");
+            if (text != resetPass)
+                return BadRequest();
+
+            ResetAction();
 
             return NoContent();
 
@@ -222,7 +231,49 @@ namespace ODRESTServer.Controllers
 
         }
 
+
+        private void ResetAction()
+        {
+
+            List<User> createUsers = new List<User>();
+            createUsers.Add(HashData(new CreateUserDTO { Name = "Morten", Email = "morten@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_ONE_PASSWORD")! }));
+            createUsers.Add(HashData(new CreateUserDTO { Name = "Goosifer", Email = "goosifer@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_TWO_PASSWORD")! }));
+            var defaultUsers = JsonSerializer.Serialize(createUsers, new JsonSerializerOptions { WriteIndented = true });
+
+            lock (fileLock)
+                System.IO.File.WriteAllText(userFile, defaultUsers);
+
+        }
+
+
+        private static User HashData(CreateUserDTO user)
+        {
+
+            byte[] salt = new byte[16];
+            RandomNumberGenerator.Fill(salt);
+
+            byte[] passPlusSalt = Encoding.UTF8.GetBytes(user.Password).Concat(salt).ToArray();
+            using SHA256 mySHA256 = SHA256.Create();
+            byte[] hashedPassWithSalt = mySHA256.ComputeHash(passPlusSalt);
+
+            User newUser = new User()
+            {
+
+                Name = user.Name,
+                Email = user.Email,
+                PasswordHashWithSalt = hashedPassWithSalt,
+                Salt = salt,
+                JoinTime = DateTime.UtcNow
+
+            };
+
+            return newUser;
+
+        }
+
     }
+
+
 
     public enum UserResults
     {
