@@ -1,15 +1,17 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddCors(option =>
+builder.Services.AddCors(options =>
 {
-    option.AddPolicy("AllowItch",
+    options.AddPolicy("AllowItch",
         policy =>
         {
-            policy.WithOrigins(
-                "https://itch.io",
-                "https://*.itch.io"
-                )
+            policy.SetIsOriginAllowed(origin =>
+            {
+                // Allow any subdomain of itch.io
+                return origin == "https://itch.io" ||
+                       origin.EndsWith(".itch.io");
+            })
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
