@@ -9,7 +9,7 @@ builder.Services.AddCors(options =>
             policy.SetIsOriginAllowed(origin =>
             {
                 // Allow any subdomain of itch.io
-                return origin == "https://itch.io" ||
+                return origin == "https://eickmayer.itch.io/" ||
                        origin.EndsWith(".itch.io");
             })
             .AllowAnyHeader()
