@@ -55,20 +55,10 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseRouting();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-// CORS middleware for itch.io WebGL
 app.Use(async (context, next) =>
 {
     var origin = context.Request.Headers["Origin"].FirstOrDefault();
@@ -94,5 +84,4 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
