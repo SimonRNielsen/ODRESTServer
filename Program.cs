@@ -1,21 +1,31 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowItch",
+//        policy =>
+//        {
+//            policy.SetIsOriginAllowed(origin =>
+//            {
+//                // Allow any subdomain of itch.io
+//                return origin == "https://eickmayer.itch.io/" ||
+//                       origin.EndsWith(".itch.io");
+//            })
+//            .AllowAnyHeader()
+//            .AllowAnyMethod()
+//            .AllowCredentials();
+//        });
+//});
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowItch",
-        policy =>
-        {
-            policy.SetIsOriginAllowed(origin =>
-            {
-                // Allow any subdomain of itch.io
-                return origin == "https://eickmayer.itch.io/" ||
-                       origin.EndsWith(".itch.io");
-            })
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddControllers();
@@ -34,7 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowItch");
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
