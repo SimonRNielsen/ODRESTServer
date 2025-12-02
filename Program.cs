@@ -1,6 +1,20 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy("AllowItch",
+        policy =>
+        {
+            policy.WithOrigins(
+                "https://itch.io",
+                "https://*.itch.io"
+                )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -17,6 +31,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowItch");
 
 app.UseAuthorization();
 

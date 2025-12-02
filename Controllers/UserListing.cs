@@ -235,9 +235,13 @@ namespace ODRESTServer.Controllers
         private void ResetAction()
         {
 
-            List<User> createUsers = new List<User>();
-            createUsers.Add(HashData(new CreateUserDTO { Name = "Morten", Email = "morten@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_ONE_PASSWORD")! }));
-            createUsers.Add(HashData(new CreateUserDTO { Name = "Goosifer", Email = "goosifer@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_TWO_PASSWORD")! }));
+            List<User> createUsers = new List<User>
+            {
+
+            HashData(new CreateUserDTO { Name = "Morten", Email = "morten@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_ONE_PASSWORD")! }),
+            HashData(new CreateUserDTO { Name = "Goosifer", Email = "goosifer@oceandefender.dk", Password = Environment.GetEnvironmentVariable("USER_TWO_PASSWORD") ! })
+
+            };
             var defaultUsers = JsonSerializer.Serialize(createUsers, new JsonSerializerOptions { WriteIndented = true });
 
             lock (fileLock)
